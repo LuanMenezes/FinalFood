@@ -1,6 +1,5 @@
 <resources>
     <string name="app_name">Final Food</string>
-    <string name="rating_value">Avaliação</string>
     <string name="select_category">Selecione uma categoria</string>
     <string-array name="category_names">
         <item>@string/select_category</item>

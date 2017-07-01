@@ -1,10 +1,17 @@
 package com.example.luan.food;
 
+import android.Manifest;
+import android.content.Context;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
+import android.location.Location;
+import android.location.LocationListener;
+import android.location.LocationManager;
 import android.os.Bundle;
 import android.os.Environment;
 import android.provider.MediaStore;
+import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.Button;
@@ -37,9 +44,11 @@ public class AddRatingActivity extends AppCompatActivity {
     private Spinner spinner;
 
     private File picture;
+    private LocationManager managerLocation;
 
     static final int REQUEST_IMAGE_CAPTURE = 1;
     static final int REQUEST_LOCATION_ACCESS = 2;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -54,11 +63,15 @@ public class AddRatingActivity extends AppCompatActivity {
 
         btCreate = (Button) findViewById(R.id.btCreate);
 
+        managerLocation = (LocationManager) this.getSystemService(Context.LOCATION_SERVICE);
+        initLocation();
+
+
         realm = Realm.getDefaultInstance();
         ratings = realm.where( Rating.class ).findAll();
     }
 
-    public void callAddUpdateDiscipline( View view ){
+    public void callCreateRating( View view ){
 
         ratings.sort( "id", RealmResults.SORT_ORDER_DESCENDING );
         long id = ratings.size() == 0 ? 1 : ratings.get(0).getId() + 1;
@@ -122,6 +135,49 @@ public class AddRatingActivity extends AppCompatActivity {
                 );
         } catch (IOException e) {
             e.printStackTrace();
+        }
+    }
+
+    private void initLocation(){
+
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            Toast.makeText(AddRatingActivity.this, "Usuário não tem permissão para obter coordendas", Toast.LENGTH_SHORT).show();
+            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, REQUEST_LOCATION_ACCESS);
+            return;
+        }else{
+            Toast.makeText(AddRatingActivity.this, "Usuário concedeu permissão para obter coordendas", Toast.LENGTH_SHORT).show();
+
+        }
+
+        LocationListener ouvidorLocalizacao = new LocationListener() {
+            public void onLocationChanged(Location location) {
+//                tvLocalizacao.setText(location.toString());
+            }
+
+            public void onStatusChanged(String provider, int status, Bundle extras) {
+            }
+
+            public void onProviderEnabled(String provider) {
+            }
+
+            public void onProviderDisabled(String provider) {
+            }
+        };
+        managerLocation.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 0, 0, ouvidorLocalizacao);
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, String permissions[], int[] grantResults) {
+        switch (requestCode) {
+            case REQUEST_LOCATION_ACCESS: {
+                if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    initLocation();
+                } else {
+                    Toast.makeText(AddRatingActivity.this, "Usuário não concedeu permissão para obter coordendas", Toast.LENGTH_SHORT).show();
+                }
+                return;
+            }
+
         }
     }
 

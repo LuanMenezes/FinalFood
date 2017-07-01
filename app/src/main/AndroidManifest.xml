@@ -5,6 +5,9 @@
     <uses-feature
         android:name="android.hardware.camera" android:required="true" />
 
+    <uses-feature android:name="android.hardware.location.gps" android:required="true" />
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+
     <application
         android:name=".application.CustomApplication"
         android:allowBackup="true"
@@ -22,6 +25,17 @@
         </activity>
         <activity android:name=".AddRatingActivity" />
         <activity android:name=".RatingActivity" />
+
+        <provider
+            android:name="android.support.v4.content.FileProvider"
+            android:authorities="com.aula.magnani.aula.a09_cameragps"
+            android:exported="false"
+            android:grantUriPermissions="true">
+            <!--<meta-data-->
+                <!--android:name="android.support.FILE_PROVIDER_PATHS"-->
+                <!--android:resource="@xml/file_paths"></meta-data>-->
+        </provider>
+
     </application>
 
 </manifest>
