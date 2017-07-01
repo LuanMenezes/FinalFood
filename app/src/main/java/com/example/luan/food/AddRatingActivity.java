@@ -1,6 +1,10 @@
 package com.example.luan.food;
 
+import android.content.Intent;
+import android.graphics.Bitmap;
 import android.os.Bundle;
+import android.os.Environment;
+import android.provider.MediaStore;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.Button;
@@ -12,6 +16,9 @@ import android.widget.Toast;
 
 import com.example.luan.food.domain.Rating;
 
+import java.io.File;
+import java.io.IOException;
+import java.text.SimpleDateFormat;
 import java.util.Date;
 
 import io.realm.Realm;
@@ -28,6 +35,11 @@ public class AddRatingActivity extends AppCompatActivity {
     private Button btCreate;
     private ImageView ivPicture;
     private Spinner spinner;
+
+    private File picture;
+
+    static final int REQUEST_IMAGE_CAPTURE = 1;
+    static final int REQUEST_LOCATION_ACCESS = 2;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -73,6 +85,43 @@ public class AddRatingActivity extends AppCompatActivity {
         catch(Exception e){
             e.printStackTrace();
             Toast.makeText(AddRatingActivity.this, "Não foi possivel cadastrar!", Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    public void onClickPicture(View v) {
+        Intent intentGetPicture = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+
+//        getNewPicture();
+//        Uri fotoUri = FileProvider.getUriForFile(
+//                this,
+//                "com.example.luan.food",
+//                picture);
+//        intencaoTirarFoto.putExtra(MediaStore.EXTRA_OUTPUT, fotoUri);
+        startActivityForResult(intentGetPicture, REQUEST_IMAGE_CAPTURE);
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (requestCode == REQUEST_IMAGE_CAPTURE && resultCode == RESULT_OK) {
+            Bundle extras = data.getExtras();
+            Bitmap imageBitmap = (Bitmap) extras.get("data");
+            ivPicture.setImageBitmap(imageBitmap);
+        }
+    }
+
+    private void getNewPicture() {
+        String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
+        String imageFileName = "MM_" + timeStamp + "_";
+        File storageDir = getExternalFilesDir(Environment.DIRECTORY_PICTURES);
+        try {
+            picture =
+                File.createTempFile(
+                    imageFileName,  /* prefix */
+                    ".jpg",         /* suffix */
+                    storageDir      /* directory */
+                );
+        } catch (IOException e) {
+            e.printStackTrace();
         }
     }
 
