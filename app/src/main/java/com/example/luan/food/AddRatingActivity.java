@@ -8,10 +8,12 @@ import android.graphics.Bitmap;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
+import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
 import android.provider.MediaStore;
 import android.support.v4.app.ActivityCompat;
+import android.support.v4.content.FileProvider;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.Button;
@@ -19,6 +21,7 @@ import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.RatingBar;
 import android.widget.Spinner;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.luan.food.domain.Rating;
@@ -42,6 +45,8 @@ public class AddRatingActivity extends AppCompatActivity {
     private Button btCreate;
     private ImageView ivPicture;
     private Spinner spinner;
+    private TextView tvLatitude;
+    private TextView tvLongitude;
 
     private File picture;
     private LocationManager managerLocation;
@@ -60,6 +65,8 @@ public class AddRatingActivity extends AppCompatActivity {
         rbRating = (RatingBar) findViewById(R.id.rbRating);
         ivPicture = (ImageView) findViewById(R.id.ivPicture);
         spinner = (Spinner) findViewById(R.id.spinner);
+        tvLatitude = (TextView) findViewById(R.id.tvLatitude);
+        tvLongitude = (TextView) findViewById(R.id.tvLongitude);
 
         btCreate = (Button) findViewById(R.id.btCreate);
 
@@ -87,7 +94,7 @@ public class AddRatingActivity extends AppCompatActivity {
             rating.setLongitude(10.00);
             rating.setRatingValue(rbRating.getNumStars());
             // TENTAR SETTAR AGORA O CAMINHO DA IMAGEM
-            rating.setPicture("asdasdasd");
+            rating.setPicture(picture.getAbsolutePath());
 
             realm.copyToRealmOrUpdate( rating );
             realm.commitTransaction();
@@ -104,21 +111,23 @@ public class AddRatingActivity extends AppCompatActivity {
     public void onClickPicture(View v) {
         Intent intentGetPicture = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
 
-//        getNewPicture();
-//        Uri fotoUri = FileProvider.getUriForFile(
-//                this,
-//                "com.example.luan.food",
-//                picture);
-//        intencaoTirarFoto.putExtra(MediaStore.EXTRA_OUTPUT, fotoUri);
+        getNewPicture();
+        Uri fotoUri = FileProvider.getUriForFile(
+                this,
+                "com.example.luan.food",
+                picture);
+        intentGetPicture.putExtra(MediaStore.EXTRA_OUTPUT, fotoUri);
         startActivityForResult(intentGetPicture, REQUEST_IMAGE_CAPTURE);
     }
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (requestCode == REQUEST_IMAGE_CAPTURE && resultCode == RESULT_OK) {
-            Bundle extras = data.getExtras();
-            Bitmap imageBitmap = (Bitmap) extras.get("data");
-            ivPicture.setImageBitmap(imageBitmap);
+            Uri fotoUri = FileProvider.getUriForFile(
+                    this,
+                    "com.example.luan.food",
+                    picture);
+            ivPicture.setImageURI(fotoUri);
         }
     }
 
@@ -151,7 +160,8 @@ public class AddRatingActivity extends AppCompatActivity {
 
         LocationListener ouvidorLocalizacao = new LocationListener() {
             public void onLocationChanged(Location location) {
-//                tvLocalizacao.setText(location.toString());
+                tvLatitude.setText(String.valueOf(location.getLatitude()));
+                tvLongitude.setText(String.valueOf(location.getLongitude()));
             }
 
             public void onStatusChanged(String provider, int status, Bundle extras) {
