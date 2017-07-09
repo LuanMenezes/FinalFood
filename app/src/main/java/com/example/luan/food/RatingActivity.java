@@ -3,6 +3,7 @@ package com.example.luan.food;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.View;
 import android.widget.ListView;
 
@@ -28,18 +29,22 @@ public class RatingActivity extends AppCompatActivity {
 
         realm = Realm.getDefaultInstance();
 
+        lvRating = (ListView) findViewById(R.id.lv_rating);
+
         realmChangeListener = new RealmChangeListener() {
             @Override
             public void onChange() {
-            ((RatingAdapter) lvRating.getAdapter()).notifyDataSetChanged();
+                ((RatingAdapter) lvRating.getAdapter()).notifyDataSetChanged();
             }
         };
 
         realm.addChangeListener(realmChangeListener);
         ratings = realm.where( Rating.class ).findAll();
 
-        lvRating= (ListView) findViewById(R.id.lv_rating);
         lvRating.setAdapter( new RatingAdapter( this, realm, ratings, false ));
+
+//        lvRating = (ListView) findViewById(R.id.lv_rating);
+//        lvRating.setAdapter( new RatingAdapter( this, realm, ratings, false ));
     }
 
     @Override

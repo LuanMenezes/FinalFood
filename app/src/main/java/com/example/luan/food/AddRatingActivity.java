@@ -90,8 +90,12 @@ public class AddRatingActivity extends AppCompatActivity {
             rating.setDescription(etDescription.getText().toString() );
             rating.setCategory(spinner.getSelectedItemPosition());
             rating.setCreatedAt(new Date());
-            rating.setLatitude(10.00);
-            rating.setLongitude(10.00);
+
+            double latitude = Double.parseDouble(tvLatitude.getText().toString());
+            double longitude = Double.parseDouble(tvLatitude.getText().toString());
+            rating.setLatitude( latitude );
+            rating.setLongitude(longitude);
+
             rating.setRatingValue(rbRating.getNumStars());
             // TENTAR SETTAR AGORA O CAMINHO DA IMAGEM
             rating.setPicture(picture.getAbsolutePath());

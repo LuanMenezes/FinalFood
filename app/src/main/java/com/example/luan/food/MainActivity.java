@@ -58,8 +58,12 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void callRating( View view){
-        Log.i("LOG", "ENTROU CALL RATING");
         Intent it = new Intent(this, AddRatingActivity.class);
+        startActivity(it);
+    }
+
+    public void callListRating( View view){
+        Intent it = new Intent(this, RatingActivity.class);
         startActivity(it);
     }
 }
