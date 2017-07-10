@@ -15,6 +15,7 @@ import android.provider.MediaStore;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.FileProvider;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -68,6 +69,15 @@ public class AddRatingActivity extends AppCompatActivity {
         tvLatitude = (TextView) findViewById(R.id.tvLatitude);
         tvLongitude = (TextView) findViewById(R.id.tvLongitude);
 
+        rbRating.setOnRatingBarChangeListener( new RatingBar.OnRatingBarChangeListener() {
+            @Override
+            public void onRatingChanged( final RatingBar ratingBar, final float rating, final boolean fromUser ) {
+                if ( fromUser ) {
+                    ratingBar.setRating( (float) Math.ceil(rating) );
+                }
+            }
+        });
+
         btCreate = (Button) findViewById(R.id.btCreate);
 
         managerLocation = (LocationManager) this.getSystemService(Context.LOCATION_SERVICE);
@@ -84,22 +94,32 @@ public class AddRatingActivity extends AppCompatActivity {
         long id = ratings.size() == 0 ? 1 : ratings.get(0).getId() + 1;
         rating.setId( id );
 
-        try{
-            realm.beginTransaction();
+        if (spinner.getSelectedItemPosition() == 0) {
+            Toast.makeText(AddRatingActivity.this, "Informe uma categoria", Toast.LENGTH_SHORT).show();
+            return;
+        }
 
-            rating.setDescription(etDescription.getText().toString() );
-            rating.setCategory(spinner.getSelectedItemPosition());
+        try {
+            rating.setDescription(etDescription.getText().toString());
+            rating.setCategory(spinner.getSelectedItem().toString());
             rating.setCreatedAt(new Date());
 
             double latitude = Double.parseDouble(tvLatitude.getText().toString());
             double longitude = Double.parseDouble(tvLatitude.getText().toString());
-            rating.setLatitude( latitude );
+            rating.setLatitude(latitude);
             rating.setLongitude(longitude);
 
-            rating.setRatingValue(rbRating.getNumStars());
+            rating.setRatingValue(rbRating.getRating());
             // TENTAR SETTAR AGORA O CAMINHO DA IMAGEM
             rating.setPicture(picture.getAbsolutePath());
+        } catch (Exception e) {
+            e.printStackTrace();
+            Toast.makeText(AddRatingActivity.this, "Preencha todos os campos", Toast.LENGTH_SHORT).show();
+            return;
+        }
 
+        try{
+            realm.beginTransaction();
             realm.copyToRealmOrUpdate( rating );
             realm.commitTransaction();
 

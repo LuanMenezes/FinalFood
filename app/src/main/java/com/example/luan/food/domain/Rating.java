@@ -24,19 +24,19 @@ public class Rating extends RealmObject {
         this.description = description;
     }
 
-    public int getCategory() {
+    public String getCategory() {
         return category;
     }
 
-    public void setCategory(int category) {
+    public void setCategory(String category) {
         this.category = category;
     }
 
-    public int getRatingValue() {
+    public float getRatingValue() {
         return ratingValue;
     }
 
-    public void setRatingValue(int ratingValue) {
+    public void setRatingValue(float ratingValue) {
         this.ratingValue = ratingValue;
     }
 
@@ -75,8 +75,8 @@ public class Rating extends RealmObject {
     @PrimaryKey
     private long id;
     private String description;
-    private int category;
-    private int ratingValue;
+    private String category;
+    private float ratingValue;
     private double latitude;
     private double longitude;
     private String picture;
